@@ -19,12 +19,12 @@ COPY --from=builder /go/go-ethereum/build/bin/* /usr/local/bin/
 
 EXPOSE 8545 8546 30303 30303/udp 30304/udp
 
-RUN groupadd -g 1000 ethereum
-RUN useradd -d /root -m -s /bin/bash -g 1000 -u 1000 ethereum && echo "ethereum:ethereum" | chpasswd
+RUN groupadd -g 1000 eth
+RUN useradd -d /root -m -s /bin/bash -g 1000 -u 1000 eth && echo "eth:eth" | chpasswd
 
 RUN chown -R 1000:1000 /root
 
-USER ethereum
+USER eth
 
 WORKDIR /root
 

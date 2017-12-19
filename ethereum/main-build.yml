@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+
+  eth-main:
+    build:
+      context: ./main
+      dockerfile: Dockerfile
+    image: pee/eth-main
+
+  eth-dev:
+    build:
+      context: ./dev
+      dockerfile: Dockerfile
+    image: pee/eth-dev
+
+
+
+
+
