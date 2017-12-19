@@ -15,12 +15,7 @@ docker run --rm  -it \
         --env="DISPLAY" \
         --volume=$XSOCK:$XSOCK:rw \
         --volume=$XAUTH:$XAUTH:rw \
-		--volume=/etc/localtime:/etc/localtime:ro \
-		--device /dev/snd \
-		--device /dev/dri \
-		--device /dev/video0 \
-		--group-add audio \
-		--group-add video \
+		--volume=mist:/mist \
         --user $(id -u):$(id -g) \
 		--ipc host \
 		--name mist \
@@ -28,6 +23,16 @@ docker run --rm  -it \
 
 
 
-# --volume="${HOME}/.slack:/slack/.config/Slack" \
+#		--device /dev/snd \
+#		--device /dev/dri \
+#		--device /dev/video0 \
+#		--group-add audio \
+#		--group-add video \
+#		--volume="${HOME}/.mist:/mist/.config/Mist" \
+#		--volume="${HOME}/.mist:/mist/.config/Mist" \
+#		--volume=mist-ether:/mist/.ethereum \
+#		--volume=/etc/localtime:/etc/localtime:ro \
+#		--volume=mist-ether:/mist \
+		
 #
 #

@@ -41,31 +41,19 @@ RUN dpkg -i mist.deb
 RUN groupadd -g 1000 mist
 RUN useradd -d /mist -m -s /bin/bash -g 1000 -u 1000 mist && echo "mist:mist" | chpasswd
 
-WORKDIR /mist
-
-RUN chown -R mist:mist /mist
-
 USER mist
 
-ENTRYPOINT ["/bin/bash"]
+VOLUME /mist
 
+#WORKDIR /mist
+#RUN mkdir /mist/.config
+#RUN mkdir /mist/.config/Mist
+#RUN chown -R mist:mist /mist
 
-
-#ENV PATH  /mist/.meteor:/mist/.yarn/bin:$PATH 
-#RUN curl https://install.meteor.com/ | sh
-#RUN curl -o- -L https://yarnpkg.com/install.sh | bash
-#RUN yarn global add electron@1.7.9
-#RUN yarn global add gulp
-
-#RUN git clone https://github.com/ethereum/mist.git
-#RUN cd /mist/mist
-#RUN yarn
-#RUN cd /mist
-#RUN curl -sSL https://github.com/ethereum/mist/releases/download/v0.9.3/Mist-linux64-0-9-3.deb
 
 
 #ENTRYPOINT ["/bin/bash"]
-#ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/usr/local/bin/mist"], ['--dev']
 
 
 
