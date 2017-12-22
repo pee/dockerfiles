@@ -6,26 +6,43 @@ services:
     restart: on-failure:10
     image: pee/eth-dev
     container_name: eth-dev-boot
-    network: ethdev
+    networks:
+      - ethdev
+    environment:
+      - RUN_BOOTNODE=true
 
-  devnode1:
-    restart: on-failure:10
-    image: pee/eth-dev
-    container_name: eth-dev-node1
-    network: ethdev
+#  devnode1:
+#    restart: on-failure:10
+#    image: pee/eth-dev
+#    container_name: eth-dev-node1
+#    networks:
+#      - ethdev
+#    environment:
+#      - RUN_BOOTNODE=false
 
-  devnode2:
-    restart: on-failure:10
-    image: pee/eth-dev
-    container_name: eth-dev-node2
-    network: ethdev
+#  devnode2:
+#    restart: on-failure:10
+#    image: pee/eth-dev
+#    container_name: eth-dev-node2
+#    networks:
+#      - ethdev
+#    environment:
+#      - RUN_BOOTNODE=false
 
-  miner:
-    restart: on-failure:10
-    image: pee/eth-dev
-    container_name: eth-dev-mine
-    network: ethdev
+#  miner:
+#    restart: on-failure:10
+#    image: pee/eth-dev
+#    container_name: eth-dev-mine
+#    networks:
+#      - ethdev
+#    environment:
+#      - RUN_BOOTNODE=false
 
+networks:
+  ethdev:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
 
 
 

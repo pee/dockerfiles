@@ -7,9 +7,11 @@ FROM golang:1.9-alpine as builder
 
 RUN apk add --no-cache make gcc musl-dev linux-headers git
 
-#ADD . /go-ethereum
+
+## Grab and build ethereum go client (geth)
+RUN mkdir /git
+WORKDIR /git
 RUN git clone https://github.com/ethereum/go-ethereum
-RUN git clone https://github.com/pee/eth-playground
 RUN cd go-ethereum && make geth
 
 # Pull Geth into a second stage deploy alpine container
@@ -17,11 +19,7 @@ FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates shadow bash
 
-RUN mkdir /opt
-COPY --from=builder /go/eth-playground/src/* /opt/
-RUN chmod +x /opt/*.sh
-
-COPY --from=builder /go/go-ethereum/build/bin/* /usr/local/bin/
+COPY --from=builder /git/go-ethereum/build/bin/* /usr/local/bin/
 
 EXPOSE 8545 8546 30303 30303/udp 30304/udp
 
@@ -34,13 +32,13 @@ ARG GID=1000
 ENV gid=$GID
 
 RUN groupadd -g $gid eth
-RUN useradd -d /root -m -s /bin/bash -u ${uid} -g ${gid} eth && echo "eth:eth" | chpasswd
+RUN useradd -d /geth -m -s /bin/bash -u ${uid} -g ${gid} eth && echo "eth:eth" | chpasswd
 
-RUN chown -R ${uid}:${gid} /root
+RUN chown -R ${uid}:${gid} /geth
 
 USER eth
 
-WORKDIR /root
+WORKDIR /geth
 
 ENTRYPOINT ["geth"]
 

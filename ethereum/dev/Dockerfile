@@ -1,12 +1,26 @@
 ##
 # 
-# Build Geth in a stock Go builder container
+# Dev bits
 #
+##########
+## builder
 ##
+FROM golang:1.9-alpine as builder
+
+RUN apk add --no-cache git
+
+WORKDIR /git
+RUN git clone https://github.com/pee/eth-playground
+RUN pwd && ls -al
+
+##
+## end builder
+##
+
 FROM pee/eth-main:latest
 
 ARG gen_nonce
-ARG data_dir
+ARG data_dir="/ethdev/.ethereum"
 ARG chain_type
 ARG run_bootnode
 ARG gen_chain_id
@@ -20,6 +34,19 @@ ENV GEN_CHAIN_ID=${gen_chain_id}
 ENV BOOTNODE_URL=${bootnode_url}
 
 
+# create /opt
+USER root
+RUN mkdir /opt
+
+COPY --from=builder /git/eth-playground/src/* /opt/
+
+RUN chown -R eth:eth /opt
+RUN chmod +x /opt/*.sh
+
+RUN mkdir /ethdev
+RUN chown eth:eth /ethdev
+
+USER eth
 WORKDIR /opt
 
 # like ethereum/client-go
@@ -30,10 +57,6 @@ EXPOSE 8545
 EXPOSE 30301
 EXPOSE 30301/udp
 
-# ADD src/* /opt/
-# RUN chmod +x /opt/*.sh
-
-#CMD ["/opt/startgeth.sh"]
 ENTRYPOINT ["/opt/startgeth.sh"]
 
 

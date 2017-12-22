@@ -9,9 +9,9 @@ docker-compose -f build.yml build \
 
 docker-compose -f build.yml build \
 	--build-arg gen_nonce="0xe1de3db4be5ddead" \
-	--build-arg data_dir="/root/.ethereum" \
+	--build-arg data_dir="/ethdev/.ethereum" \
 	--build-arg chain_type="private" \
-	--build-arg run_bootnode="true" \
+	--build-arg run_bootnode="false" \
 	--build-arg gen_chain_id="1971" \
 	--build-arg bootnode_url="" \
 	eth-dev
