@@ -12,7 +12,7 @@ RUN apk add --no-cache make gcc musl-dev linux-headers git
 RUN mkdir /git
 WORKDIR /git
 RUN git clone https://github.com/ethereum/go-ethereum
-RUN cd go-ethereum && make geth
+RUN cd go-ethereum && make all
 
 # Pull Geth into a second stage deploy alpine container
 FROM alpine:latest
