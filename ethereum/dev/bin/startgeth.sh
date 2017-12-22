@@ -26,14 +26,14 @@ BOOTNODE=$DEV_ROOT/bootnode
 
 # replace vars
 if [[ ! -z $GEN_NONCE ]]; then
-    echo "Generating genesis.nonce from arguments..."
+    echo "Generating genesis.nonce..."
     sed "s/\${GEN_NONCE}/$GEN_NONCE/g" -i $GENESIS
 fi
 
-echo "Generating genesis.alloc from arguments..."
+echo "Generating genesis.alloc..."
 sed "s/\${GEN_ALLOC}/$GEN_ALLOC/g" -i $GENESIS
 
-echo "Generating genesis.chainid from arguments..."
+echo "Generating genesis.chainid..."
 sed "s/\${GEN_CHAIN_ID}/$GEN_CHAIN_ID/g" -i $GENESIS
 
 echo "Running ethereum node with CHAIN_TYPE=$CHAIN_TYPE"
@@ -41,7 +41,6 @@ if [ "$CHAIN_TYPE" == "private" ]; then
 
   # empty datadir -> geth init
   echo "DATA_DIR=$DATA_DIR, contents:"
-  ls -la $DATA_DIR
   if [ ! -d "$DATA_DIR" ] || [ -d "ls -A $DATA_DIR" ]; then
       echo "DATA_DIR '$DATA_DIR' non existant or empty. Initializing DATA_DIR..."
       geth --datadir "$DATA_DIR" init $GENESIS
@@ -59,7 +58,7 @@ if [ "$RUN_BOOTNODE" == "true" ]; then
     mkdir -p $BOOTNODE
     if [ ! -f "$KEY_FILE" ]; then
        echo "(creating $KEY_FILE)"
-       bootnode --genkey="$KEY_FILE"
+       /usr/local/bin/bootnode --genkey="$KEY_FILE"
     fi
     [[ -z $BOOTNODE_SERVICE ]] && BOOTNODE_SERVICE=$MY_IP
     echo "Running bootnode with arguments '--nodekey=$KEY_FILE --addr $BOOTNODE_SERVICE:30301 $@'"
