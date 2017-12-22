@@ -3,21 +3,39 @@
 # Build Geth in a stock Go builder container
 #
 ##
-FROM golang:1.9-alpine as builder
+FROM pee/eth-main:latest
 
-RUN apk add --no-cache make gcc musl-dev linux-headers git
+ARG gen_nonce
+ARG data_dir
+ARG chain_type
+ARG run_bootnode
+ARG gen_chain_id
+ARG bootnode_url
 
-#ADD . /go-ethereum
-RUN git clone https://github.com/ethereum/go-ethereum
-RUN cd go-ethereum && make geth
+ENV GEN_NONCE=${gen_nonce}
+ENV DATA_DIR=${data_dir}
+ENV CHAIN_TYPE=${chain_type}
+ENV RUN_BOOTNODE=${run_bootnode}
+ENV GEN_CHAIN_ID=${gen_chain_id}
+ENV BOOTNODE_URL=${bootnode_url}
 
-# Pull Geth into a second stage deploy alpine container
-FROM alpine:latest
 
-RUN apk add --no-cache ca-certificates shadow bash
-COPY --from=builder /go/go-ethereum/build/bin/* /usr/local/bin/
+WORKDIR /opt
 
-EXPOSE 8545 8546 30303 30303/udp 30304/udp
+# like ethereum/client-go
+EXPOSE 30303
+EXPOSE 8545
+
+# bootnode port
+EXPOSE 30301
+EXPOSE 30301/udp
+
+# ADD src/* /opt/
+# RUN chmod +x /opt/*.sh
+
+#CMD ["/opt/startgeth.sh"]
+ENTRYPOINT ["/opt/startgeth.sh"]
+
 
 
 

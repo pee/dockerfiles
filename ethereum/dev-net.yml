@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+
+  bootnode:
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-boot
+    network: ethdev
+
+  devnode1:
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-node1
+    network: ethdev
+
+  devnode2:
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-node2
+    network: ethdev
+
+  miner:
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-mine
+    network: ethdev
+
+
+
+
+
+
