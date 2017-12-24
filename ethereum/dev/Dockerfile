@@ -22,12 +22,12 @@ ENV GEN_CHAIN_ID=${gen_chain_id}
 ENV BOOTNODE_URL=${bootnode_url}
 
 # like ethereum/client-go
-EXPOSE 30303
-EXPOSE 8545
+#EXPOSE 30303
+#EXPOSE 8545
 
 # bootnode port
-EXPOSE 30301
-EXPOSE 30301/udp
+#EXPOSE 30301
+#EXPOSE 30301/udp
 
 
 # create /opt
@@ -40,6 +40,9 @@ ADD genesis.json ${dev_root}/
 RUN chown -R eth:eth ${dev_root}
 RUN chmod +x ${dev_root}/bin/*.sh
 
+RUN mkdir /boot
+RUN chown eth:eth /boot
+VOLUME /boot
 
 USER eth
 WORKDIR /devnet

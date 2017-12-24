@@ -7,39 +7,80 @@ services:
     image: pee/eth-dev
     container_name: eth-dev-boot
     networks:
-      - ethdev
+      - circlejerk
+    ports:
+        - 8546:8545
+        - 30301/tcp
+        - 30301/udp
+        - 30303
     environment:
       - RUN_BOOTNODE=true
+    volumes:
+      - bootShare:/boot
+    command: --verbosity=5
 
-#  devnode1:
-#    restart: on-failure:10
-#    image: pee/eth-dev
-#    container_name: eth-dev-node1
-#    networks:
-#      - ethdev
-#    environment:
-#      - RUN_BOOTNODE=false
+  devnode1:
+    depends_on:
+      - bootnode
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-node1
+    networks:
+      - circlejerk
+    ports:
+        - 8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node1 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+#    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node1 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
 
-#  devnode2:
-#    restart: on-failure:10
-#    image: pee/eth-dev
-#    container_name: eth-dev-node2
-#    networks:
-#      - ethdev
-#    environment:
-#      - RUN_BOOTNODE=false
+  devnode2:
+    depends_on:
+      - bootnode
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-node2
+    networks:
+      - circlejerk
+    ports:
+        - 8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node2 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+#    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node2 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
 
-#  miner:
-#    restart: on-failure:10
-#    image: pee/eth-dev
-#    container_name: eth-dev-mine
-#    networks:
-#      - ethdev
-#    environment:
-#      - RUN_BOOTNODE=false
+  devnode3:
+    depends_on:
+      - bootnode
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-node3
+    networks:
+      - circlejerk
+    ports:
+        - 8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node3 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+#    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node3 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+
+
+##
+##
+volumes:
+  bootShare:
 
 networks:
-  ethdev:
+  circlejerk:
     driver: bridge
     driver_opts:
       com.docker.network.enable_ipv6: "false"

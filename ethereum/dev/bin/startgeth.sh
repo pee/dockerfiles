@@ -55,10 +55,19 @@ if [ "$RUN_BOOTNODE" == "true" ]; then
 
     echo "Running bootnode..."
     KEY_FILE="$BOOTNODE/boot.key"
+	PUB_KEY="/boot/pub.key"
     mkdir -p $BOOTNODE
     if [ ! -f "$KEY_FILE" ]; then
        echo "(creating $KEY_FILE)"
        /usr/local/bin/bootnode --genkey="$KEY_FILE"
+	   /usr/local/bin/bootnode --nodekey="$KEY_FILE" --writeaddress > $PUB_KEY
+#	   ENODE="self=enode://"
+	   ENODE="enode://"
+	   ENODE=$ENODE`cat $PUB_KEY`
+	   ENODE=$ENODE"@"
+	   ENODE=$ENODE$MY_IP
+	   ENODE=$ENODE":30301"
+	   echo $ENODE > /boot/enode.txt
     fi
     [[ -z $BOOTNODE_SERVICE ]] && BOOTNODE_SERVICE=$MY_IP
     echo "Running bootnode with arguments '--nodekey=$KEY_FILE --addr $BOOTNODE_SERVICE:30301 $@'"
@@ -67,8 +76,9 @@ if [ "$RUN_BOOTNODE" == "true" ]; then
 #    exec /usr/local/bin/bootnode --nodekey="$KEY_FILE" "$@"
 fi
 
-echo "Running geth with arguments $GEN_ARGS $@"
-exec /usr/local/bin/geth $GEN_ARGS "$@"
+ENODE=`cat /boot/enode.txt`
+echo "Running geth with arguments --bootnode=$ENODE $GEN_ARGS $@"
+exec /usr/local/bin/geth --bootnodes=$ENODE $GEN_ARGS "$@"
 
 
 
