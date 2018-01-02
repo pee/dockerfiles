@@ -2,12 +2,12 @@
 #
 # build things
 #
-docker-compose -f build.yml build \
+docker-compose build \
 	--build-arg UID=1000 \
 	--build-arg GID=1000 \
 	eth-main
 
-docker-compose -f build.yml build \
+docker-compose build \
 	--build-arg gen_nonce="0xe1de3db4be5ddead" \
 	--build-arg dev_root="/ethdev" \
 	--build-arg data_dir="/ethdev/.ethereum" \
@@ -17,14 +17,14 @@ docker-compose -f build.yml build \
 	--build-arg bootnode_url="" \
 	eth-dev
 
-docker-compose -f build.yml build \
+docker-compose build \
 	bootnode
 
-docker-compose -f build.yml build \
+docker-compose build \
 	rpcnode
 
-docker-compose -f build.yml build \
+docker-compose build \
 	worknode
 
-docker-compose -f build.yml build \
+docker-compose build \
 	minernode

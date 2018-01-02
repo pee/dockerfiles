@@ -1,20 +1,159 @@
-version: '3.4'
+version: '3.5'
+
 services:
-  go-ethereum:
+
+  ##
+  #
+  # Generic node
+  #
+  ##
+  eth-main:
     build:
       context: ./
-      dockerfile: Dockerfile
-    image: pee/go-ethereum
-    container_name: ethereum_main
-    restart: 'true'
-    ports:
-      - "8545:8545"
-      - "30303:30303"
+      dockerfile: Dockerfile.main
+    image: pee/eth-main
+
+  ##
+  #
+  # Base development image
+  #
+  ##
+  eth-dev:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    image: pee/eth-dev
+
+  ##
+  #
+  # boot node to link up network
+  #
+  ##
+  bootnode:
+    build:
+      context: ./
+      dockerfile: Dockerfile.bootnode
+    image: pee/eth-dev-boot
+    container_name: eth-dev-boot
     restart: on-failure:10
-    user: $UID
-    entrypoint: /usr/local/bin/geth --rpc --rpcaddr 0.0.0.0
+    networks:
+      - circlejerk
+    ports:
+        - 8545
+        - 30301/tcp
+        - 30301/udp
+        - 30303
+    environment:
+      - RUN_BOOTNODE=true
+    volumes:
+      - bootShare:/boot
+#    command: --verbosity=2
+
+
+
+  ##
+  #
+  #
+  #
+  ##
+  rpcnode:
+    depends_on:
+      - bootnode
+    build:
+      context: ./
+      dockerfile: Dockerfile.rpcnode
+    image: pee/eth-dev-rpc
+    container_name: eth-dev-rpc
+    restart: on-failure:10
+    networks:
+      - circlejerk
+      - default
+    ports:
+        - 8550:8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --verbosity=5
+#    command: --verbosity=5 --identity dev-entry --ipcdisable --nat none --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+
+
+  ##
+  #
+  #
+  #
+  ##
+  worknode:
+    depends_on:
+      - bootnode
+      - rpcnode
+    build:
+      context: ./
+      dockerfile: Dockerfile.worknode
+    image: pee/eth-dev-worker
+    container_name: eth-dev-worker
+    restart: on-failure:10
+    networks:
+      - circlejerk
+    ports:
+        - 8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --verbosity=2
+#    command: --verbosity=2 --identity dev-worker --ipcdisable --nat none --verbosity=2 --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+
+
+  ##
+  #
+  #
+  #
+  ##
+  minernode:
+    depends_on:
+      - bootnode
+      - rpcnode
+      - worknode
+    build:
+      context: ./
+      dockerfile: Dockerfile.minernode
+    image: pee/eth-dev-miner
+    container_name: eth-dev-miner
+    restart: on-failure:10
+    networks:
+      - circlejerk
+      - default
+    ports:
+        - 8551:8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --verbosity=5 --etherbase "0x94163a9442545f6772E532FE05f150b301bE6659"
+#    command: --verbosity=5 --identify dev-miner --etherbase "0x94163a9442545f6772E532FE05f150b301bE6659" --mine --minerthreads 1 --ipcdisable --nat none  --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+
+
+##
+##
+volumes:
+  bootShare:
+
+networks:
+  default:
+  circlejerk:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
 
 
 
 
-
+##
+#
+#
+#
+##

@@ -1,0 +1,13 @@
+##########################
+# 
+# Dev net bootnode
+#
+##########################
+FROM pee/eth-dev:latest
+
+## FIXME: does not use dev_root
+ENTRYPOINT ["/ethdev/bin/startgeth.sh"," --identity dev-worker --ipcdisable --nat none --cache 128 --maxpeers 10"]
+
+
+
+

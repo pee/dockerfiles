@@ -1,0 +1,13 @@
+##########################
+# 
+# Dev net bootnode
+#
+##########################
+FROM pee/eth-dev:latest
+
+## FIXME: does not use dev_root
+ENTRYPOINT ["/ethdev/bin/startgeth.sh"," --identify dev-entry --ipcdisable --nat none --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain *"]
+
+
+
+
