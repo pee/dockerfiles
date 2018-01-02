@@ -2,6 +2,9 @@ version: '3.4'
 
 services:
 
+  ##
+  ## Boot node, provides bootstrap parameters for the "worker/client" nodes
+  ##
   bootnode:
     restart: on-failure:10
     image: pee/eth-dev
@@ -9,7 +12,7 @@ services:
     networks:
       - circlejerk
     ports:
-        - 8546:8545
+        - 8545
         - 30301/tcp
         - 30301/udp
         - 30303
@@ -17,14 +20,39 @@ services:
       - RUN_BOOTNODE=true
     volumes:
       - bootShare:/boot
-    command: --verbosity=5
+    command: --verbosity=2
 
-  devnode1:
+  ##
+  ## Entry node provides the rpc endpoint we'll be using in the dev environment
+  ##
+  dev-entry:
     depends_on:
       - bootnode
     restart: on-failure:10
     image: pee/eth-dev
-    container_name: eth-dev-node1
+    container_name: eth-dev-entry
+    networks:
+      - circlejerk
+      - default
+    ports:
+        - 8550:8545
+        - 30303
+    environment:
+      - RUN_BOOTNODE=false
+    volumes:
+      - bootShare:/boot
+    command: --verbosity=5 --identity dev-entry --ipcdisable --nat none --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+
+  ##
+  ##
+  ## Worker/Client node that is not accessed by us directly via RPC
+  ##
+  dev-worker:
+    depends_on:
+      - bootnode
+    restart: on-failure:10
+    image: pee/eth-dev
+    container_name: eth-dev-worker
     networks:
       - circlejerk
     ports:
@@ -34,43 +62,30 @@ services:
       - RUN_BOOTNODE=false
     volumes:
       - bootShare:/boot
-    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node1 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
-#    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node1 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+    command: --verbosity=2 --identity dev-worker --ipcdisable --nat none --verbosity=2 --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
 
-  devnode2:
+
+  ##
+  ## A generic worker that also "mines" coins in order to have currency to work with
+  dev-miner:
     depends_on:
       - bootnode
+      - dev-entry
+      - dev-worker
     restart: on-failure:10
     image: pee/eth-dev
-    container_name: eth-dev-node2
+    container_name: eth-dev-miner
     networks:
       - circlejerk
+      - default
     ports:
-        - 8545
+        - 8551:8545
         - 30303
     environment:
       - RUN_BOOTNODE=false
     volumes:
       - bootShare:/boot
-    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node2 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
-#    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node2 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
-
-  devnode3:
-    depends_on:
-      - bootnode
-    restart: on-failure:10
-    image: pee/eth-dev
-    container_name: eth-dev-node3
-    networks:
-      - circlejerk
-    ports:
-        - 8545
-        - 30303
-    environment:
-      - RUN_BOOTNODE=false
-    volumes:
-      - bootShare:/boot
-    command: --ipcdisable --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node3 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
+    command: --verbosity=5 --identify dev-miner --etherbase "0x94163a9442545f6772E532FE05f150b301bE6659" --mine --minerthreads 1 --ipcdisable --nat none  --cache=128 --maxpeers=10 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
 #    command: --ipcdisable --nodiscover --nat none --verbosity=4 --cache=512 --maxpeers=3 --identity node3 --rpc --rpcaddr=0.0.0.0 --rpcapi=db,eth,net,web3,personal --rpccorsdomain "*"
 
 
@@ -80,6 +95,7 @@ volumes:
   bootShare:
 
 networks:
+  default:
   circlejerk:
     driver: bridge
     driver_opts:

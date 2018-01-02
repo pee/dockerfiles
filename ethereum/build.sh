@@ -16,3 +16,15 @@ docker-compose -f build.yml build \
 	--build-arg gen_chain_id="1971" \
 	--build-arg bootnode_url="" \
 	eth-dev
+
+docker-compose -f build.yml build \
+	bootnode
+
+docker-compose -f build.yml build \
+	rpcnode
+
+docker-compose -f build.yml build \
+	worknode
+
+docker-compose -f build.yml build \
+	minernode

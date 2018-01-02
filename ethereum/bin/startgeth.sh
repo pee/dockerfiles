@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Originally from https://github.com//eth-playground
+# Originally from https://github.com/vertigobr/ethereum
 #
 
 #MY_IP=$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')

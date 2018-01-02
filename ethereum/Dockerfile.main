@@ -40,5 +40,13 @@ USER eth
 
 WORKDIR /geth
 
-ENTRYPOINT ["geth"]
+ENTRYPOINT ["/usr/local/bin/geth"]
 
+
+
+
+
+
+##
+##
+##
