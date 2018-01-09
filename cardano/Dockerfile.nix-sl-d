@@ -1,0 +1,25 @@
+#
+#
+#
+FROM nixos/nix:1.11.14
+
+# install git
+RUN nix-env -ib git
+
+# nix config bits
+RUN mkdir /etc/nix
+# Caches for io-hk
+RUN echo binary-caches = https://cache.nixos.org https://hydra.iohk.io > /etc/nix/nix.conf
+RUN echo binary-caches-public-keys = hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= >> /etc/nix/nix.conf
+
+# pull the settlement layer and the wallet
+RUN git clone https://github.com/input-output-hk/cardano-sl.git /cardano-sl
+RUN git clone https://github.com/input-output-hk/daedalus.git /daedalus
+
+#
+WORKDIR /cardano-sl
+RUN nix-build release.nix -A connect.mainnetWallet -o connect-to-mainnet
+
+
+
+
