@@ -1,1 +1,1 @@
-docker build -t slack .
+docker build -t pee/slack-bin .

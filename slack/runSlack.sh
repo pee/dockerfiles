@@ -17,6 +17,7 @@ docker run --rm  -it \
         --volume=$XAUTH:$XAUTH:rw \
 		--volume=/etc/localtime:/etc/localtime:ro \
 		--volume="${HOME}/.slack:/slack/.config/Slack" \
+		--volume="/tmp:/tmp" \
 		--device /dev/snd \
 		--device /dev/dri \
 		--device /dev/video0 \
@@ -25,7 +26,7 @@ docker run --rm  -it \
         --user $(id -u):$(id -g) \
 		--ipc host \
 		--name slack \
-		slack:latest "$@"
+		pee/slack-bin:latest "$@"
 
 
 
